@@ -34,18 +34,27 @@ import (
 )
 
 // Place a barrier in this function --use Mutex's and Semaphores
-func doStuff(goNum int, wg *sync.WaitGroup, count *atomic.Int32, barrier chan struct{}, total int) bool {
+func doStuff(goNum int, wg *sync.WaitGroup, count *atomic.Int32, barrierOne chan struct{}, barrierTwo chan struct{}, total int) bool {
 	time.Sleep(time.Second)
-	fmt.Println("Part A", goNum)
-	if count.Add(1) == int32(total) {
-		for i := 1; i < total; i++ {
-			barrier <- struct{}{}
+	for range 5 {
+		fmt.Println("Part A", goNum)
+		if count.Add(1) == int32(total) {
+			for i := 1; i < total; i++ {
+				barrierOne <- struct{}{}
+			}
+		} else {
+			<-barrierOne
 		}
-	} else {
-		<-barrier
+		//we wait here until everyone has completed part A
+		fmt.Println("PartB", goNum)
+		if count.Add(-1) == 0 {
+			for i := 1; i < total; i++ {
+				barrierTwo <- struct{}{}
+			}
+		} else {
+			<-barrierTwo
+		}
 	}
-	//we wait here until everyone has completed part A
-	fmt.Println("PartB", goNum)
 	wg.Done()
 	return true
 }
@@ -60,10 +69,11 @@ func main() {
 	sem := semaphore.NewWeighted(int64(totalRoutines))
 	theLock.Lock()
 	var count atomic.Int32
-	barrier := make(chan struct{})
+	barrierOne := make(chan struct{})
+	barrierTwo := make(chan struct{})
 	sem.Acquire(ctx, 1)
 	for i := range totalRoutines { //create the go Routines here
-		go doStuff(i, &wg, &count, barrier, totalRoutines)
+		go doStuff(i, &wg, &count, barrierOne, barrierTwo, totalRoutines)
 	}
 	sem.Release(1)
 	theLock.Unlock()
