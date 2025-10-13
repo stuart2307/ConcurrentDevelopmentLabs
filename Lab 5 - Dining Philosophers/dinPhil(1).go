@@ -43,7 +43,7 @@ func eat(index int) {
 }
 
 func getForks(index int, forks map[int]chan bool) {
-	//Index 0 takes the forks in the opposite order, preventing deadlock.
+	//Index 0 writes to the channels in the opposite order, preventing deadlock (picks up the forks the opposite way).
 	if index == 0 {
 		forks[(index+1)%5] <- true
 		forks[(index)] <- true
@@ -51,11 +51,10 @@ func getForks(index int, forks map[int]chan bool) {
 		forks[index] <- true
 		forks[(index+1)%5] <- true
 	}
-
 }
 
 func putForks(index int, forks map[int]chan bool) {
-	//reads from the channels, unblocking them
+	//reads from the channels, unblocking them (putting the forks back down)
 	<-forks[index]
 	<-forks[(index+1)%5]
 }
