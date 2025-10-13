@@ -61,6 +61,7 @@ func putForks(index int, forks map[int]chan bool) {
 
 func doPhilStuff(index int, wg *sync.WaitGroup, forks map[int]chan bool) {
 	for {
+		//The Philosophers think, grab forks, eat, and put the forks down, forever. Everyone knows that's all philosophers do, right?
 		think(index)
 		getForks(index, forks)
 		eat(index)
