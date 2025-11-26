@@ -38,20 +38,25 @@ func doStuff(goNum int, wg *sync.WaitGroup, count *atomic.Int32, barrierOne chan
 	time.Sleep(time.Second)
 	for range 5 {
 		fmt.Println("Part A", goNum)
+		// Use atomic int to prevent concurrency issues.
 		if count.Add(1) == int32(total) {
 			for i := 1; i < total; i++ {
+				// Put empty structs into channel, allowing other threads to take and move on.
 				barrierOne <- struct{}{}
 			}
 		} else {
+			// Try to take struct from channel, waits until struct enters channel to take.
 			<-barrierOne
 		}
 		//we wait here until everyone has completed part A
 		fmt.Println("PartB", goNum)
 		if count.Add(-1) == 0 {
 			for i := 1; i < total; i++ {
+				// Put empty structs into channel, allowing other threads to take and move on.
 				barrierTwo <- struct{}{}
 			}
 		} else {
+			// Try to take struct from channel, waits until struct enters channel to take.
 			<-barrierTwo
 		}
 	}
