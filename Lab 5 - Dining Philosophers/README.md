@@ -1,4 +1,4 @@
-# Concurrent Development Labwork
+# Dining Philosophers
 This repository contains the code for my attempts at the Concurrent Development Labs.
 This folder contains the well-known Dining Philosophers problem, and a known solution.
 
