@@ -39,9 +39,11 @@ func doStuff(goNum int, wg *sync.WaitGroup, count *atomic.Int32, barrier chan st
 	fmt.Println("Part A", goNum)
 	if count.Add(1) == int32(total) {
 		for i := 1; i < total; i++ {
+			// Put empty structs into channel, allowing other threads to take and move on.
 			barrier <- struct{}{}
 		}
 	} else {
+		// Try to take struct from channel, waits until struct enters channel to take.
 		<-barrier
 	}
 	//we wait here until everyone has completed part A
