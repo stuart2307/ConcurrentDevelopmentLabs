@@ -1,4 +1,5 @@
 # Dining Philosophers
+https://github.com/stuart2307/ConcurrentDevelopmentLabs
 This repository contains the code for my attempts at the Concurrent Development Labs.
 This folder contains the well-known Dining Philosophers problem, and a known solution.
 
